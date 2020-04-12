@@ -14,6 +14,7 @@ import io
 import os
 import sys
 import requests
+import boto3
 
 
 
@@ -163,44 +164,49 @@ def keywordDetector(txt):
 
         return [tipo(txt), diarioortotal(txt), comunidad(txt), densidadPoblacion(txt)]
     elif count ==1:
-        resp = 'Me falta saber el dato de:\n\n' +answer[0]+'Escribelo todo en un mismo mensaje por favor. '+\
-               'Si añades por millon, los datos estarán normalizados.'
+        resp = 'Me falta saber el dato de:\n\n' +answer[0]+'Escribelo todo en un mismo mensaje por favor.\n'+\
+               'Te recuerdo que si añades *"millon"* te daré los datos estarán normalizados.'
 
         return resp
     elif count == 2:
-        resp = 'Me faltan los siguientes datos:\n\n'+ answer[0] + answer[1]+ 'Escribelo todo en un mismo mensaje por favor. ' +\
-            'Si añades por millon, los datos estarán normalizados.'
+        resp = 'Me faltan los siguientes datos:\n\n'+ answer[0] + answer[1]+ 'Escribelo todo en un mismo mensaje, por favor.\n' +\
+               'Te recuerdo que si añades *"millon"* te daré los datos estarán normalizados.'
         return resp
     else:
-        resp = 'Hola, no te pude entender! Funciono con palabras clave, asi que dime en una misma frase que quieres saber: \n\n '+\
-            '*-Contagiados/fallecidos* \n\n *-Acumulado/diario* \n\n*-Las comunidades españolas* en las que quieras conocerlo\n\n '+\
-            '-Además, si dices *"millon"* te daré los *datos normalizados* por cada millon de habitantes. \n\n' + \
-            'Un ejemplo de frase:\n\n _Numero de infectados acumulados en España, Madrid, Aragon y Andalucia_\n\n' +\
-            'Me da igual en que orden digas las cosas! Simplemente necesito que me digas las tres primeras palabras clave y funcionare!\n'+\
+        resp = 'Hola, no te he entendido! Funciono con palabras clave, así que dime en una misma frase qué quieres saber: \n\n '+\
+            '*- Contagiados/fallecidos* \n\n *- Acumulado/diario* \n\n*- Comunidades españolas* en las que quieras conocerlo\n\n '+\
+            '\* Además, si dices *"millon"* te daré los *datos normalizados* por cada millón de habitantes. \n\n' + \
+            'Ejemplo de frase:\n\n_Numero de infectados acumulados en España, Madrid, Aragon y Andalucia_\n\n' +\
+            'No me importa en qué orden me digas las cosas. Simplemente necesito las tres primeras palabras clave y funcionaré!\n'+\
             'Muchas gracias por usarme!'
 
         return resp
 
-def chatID( number_id):
-    f = open('IdChats.txt', 'r')
-    SaveChats = f.read()
-    f.close()
-    SaveChats = SaveChats.split(',')
-    exist = True
-    for i in SaveChats:
+def chatID( number_id, SavedChats):
+
+    SavedChatsList = SavedChats.split(',')
+    
+    for i in SavedChatsList:
         
         if number_id==i:
-            exist= True
-            
+            return SavedChats
+        
+    return SavedChats+','+ number_id 
+        
+        
+    
 
-            break
-        else:
-            exist = False
-    if not exist:
-        f = open('IdChats.txt', 'a')
-        f.write((number_id)+',')
-        f.close()
-    return True
+def getListChats(bucket_name):
+    s3 = boto3.client('s3')
+    print('bot3cogido')
+    response = s3.get_object(Bucket=bucket_name, Key='IdChats.txt')
+    print(response)
+    return response
+
+def writeListChats(bucket_name, chats):
+    s3 = boto3.client('s3')
+    
+    s3.put_object(Bucket=bucket_name, Key='IdChats.txt', Body =chats )
 
 def densidadPoblacion(txt):
 

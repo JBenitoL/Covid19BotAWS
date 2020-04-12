@@ -9,7 +9,7 @@ import requests
 
 
 TOKEN = os.environ.get('CORONATOKEN')
-
+BucketName = os.environ['BUCKET_NAME_CHAT_ID']
 BASE_URL = "https://api.telegram.org/bot{}".format(TOKEN)
 
 
@@ -18,10 +18,12 @@ def coronabotfunction(event, context):
     data = json.loads(event["body"])
     message = str(data["message"]["text"])
     chat_id = data["message"]["chat"]["id"]
-    #print(chat_id)
-    #print(message)
-    #chatID( chat_id)
-    
+
+    OldChats = getListChats(BucketName)
+    Messsage = OldChats['Body'].read().decode('utf-8') 
+    ChatNew = chatID(str(chat_id), Messsage)
+    writeListChats(BucketName , ChatNew)
+
 
     
     print(message)
