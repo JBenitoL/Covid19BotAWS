@@ -28,11 +28,11 @@ def coronabotfunction(event, context):
     
     answer = keywordDetector(message)
     if type(answer)== str:
-        data = {"text": answer.encode("utf8"), "chat_id": chat_id}
+        data = {"text": answer.encode("utf8"), "chat_id": chat_id, "parse_mode": "markdown"}
         url = BASE_URL + "/sendMessage"
         requests.post(url, data)
     else:
-        pic = ploteame(answer[0], answer[2], answer[1])
+        pic = ploteame(answer[0], answer[2], answer[1], answer[3])
         url = BASE_URL + "/sendPhoto"
         files = {'photo': pic}
         data ={ "chat_id": chat_id}

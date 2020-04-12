@@ -50,7 +50,7 @@ def cod_ine(NomCom):
     
     return -1
    
-def ploteame(txt, Comunidad, tipo):
+def ploteame(txt, Comunidad, tipo, densidad):
 
     count = -1
     plt.figure()
@@ -63,8 +63,14 @@ def ploteame(txt, Comunidad, tipo):
         
         df = dfOld.set_index('cod_ine')
         NombreComunidad = df['CCAA'].loc[i]
+        NombreComunidad='España' if i==0 else NombreComunidad
         df = df.loc[i][1:np.shape(dfOld)[1]]
-        df.index = pd.to_datetime(df.index)    
+        df.index = pd.to_datetime(df.index) 
+ 
+        if densidad: 
+            
+            df = 1000000*df/(Poblacion( i))
+            
         if tipo.upper().find('DIA')>-1:
             ax.bar(df.index, df.diff(), color = cm.tab10(count), label = NombreComunidad)
         
@@ -78,7 +84,12 @@ def ploteame(txt, Comunidad, tipo):
     
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
     ax.tick_params(labelsize=13)
-    ylab = txt+' '+ diarioortotal(tipo) 
+    if densidad:
+        ylab =txt+' '+ diarioortotal(tipo) +' '+ 'POR MILL.'
+    else:
+        ylab = txt+' '+ diarioortotal(tipo)
+
+     
     ax.set_ylabel(ylab, fontsize = 13)
     plt.legend(loc=2, fontsize = 13)  
     plt.tight_layout()     
@@ -134,26 +145,41 @@ def GetStat(txt):
 
 
 def keywordDetector(txt):
-    answer= ' '
+    answer= []
     count = 0
     if not tipo(txt): 
         count = count +1
-        answer = answer + 'muertos/contagiados '
+        answer.append('*-Contagiados/fallecidos*\n\n')
     if not diarioortotal(txt):
         count = count +1
-        answer = answer + 'diario/total '
+        answer.append('*-Acumulado/diario*\n\n')
     if not comunidad(txt): 
         count = count +1
-        answer = answer + 'comunidad/es'
+        answer.append('*-Comunidad/es*\n\n')
+    
+
 
     if count == 0:
-        return [tipo(txt), diarioortotal(txt), comunidad(txt)]
+
+        return [tipo(txt), diarioortotal(txt), comunidad(txt), densidadPoblacion(txt)]
     elif count ==1:
-        return 'Me falta saber el dato de' +answer+'. Escribemelo todo en un mismo mensaje por favor.'
+        resp = 'Me falta saber el dato de:\n\n' +answer[0]+'Escribelo todo en un mismo mensaje por favor. '+\
+               'Si añades por millon, los datos estarán normalizados.'
+
+        return resp
     elif count == 2:
-        return 'Me faltan los siguientes datos:'+ answer + '. Escribemelo todo en un mismo mensaje por favor.'
+        resp = 'Me faltan los siguientes datos:\n\n'+ answer[0] + answer[1]+ 'Escribelo todo en un mismo mensaje por favor. ' +\
+            'Si añades por millon, los datos estarán normalizados.'
+        return resp
     else:
-        return 'Para que te pueda entender, necesito que me escribas en un mismo mensaje los sigiuentes datos:' +answer
+        resp = 'Hola, no te pude entender! Funciono con palabras clave, asi que dime en una misma frase que quieres saber: \n\n '+\
+            '*-Contagiados/fallecidos* \n\n *-Acumulado/diario* \n\n*-Las comunidades españolas* en las que quieras conocerlo\n\n '+\
+            '-Además, si dices *"millon"* te daré los *datos normalizados* por cada millon de habitantes. \n\n' + \
+            'Un ejemplo de frase:\n\n _Numero de infectados acumulados en España, Madrid, Aragon y Andalucia_\n\n' +\
+            'Me da igual en que orden digas las cosas! Simplemente necesito que me digas las tres primeras palabras clave y funcionare!\n'+\
+            'Muchas gracias por usarme!'
+
+        return resp
 
 def chatID( number_id):
     f = open('IdChats.txt', 'r')
@@ -175,3 +201,25 @@ def chatID( number_id):
         f.write((number_id)+',')
         f.close()
     return True
+
+def densidadPoblacion(txt):
+
+    x = txt.split() 
+    for i in x:
+        if i.upper().find('DENSID')>-1 or i.upper().find('POBLA')>-1 or  i.upper().find('MILL')>-1 :
+            return True
+    
+    return False        
+        
+       
+   
+
+def Poblacion(cod):
+    Df = pd.read_csv('PoblacionEspañola.csv',   sep=';', encoding = 'latin')
+    Number = (Df.loc[cod]['Numero'])
+    Prev=''
+    for x in Number.split('.'):
+        print(type(x))
+        Prev = Prev + x
+    print(float(Prev))
+    return float(Prev)
