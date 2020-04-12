@@ -18,7 +18,7 @@
   #  zip: true
 
 
-service: my-telegram-bot-dev-post
+service: covid19-telegram-bot
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
 #org: your-org-name
@@ -70,8 +70,8 @@ provider:
 functions:
   post:
     handler: coronabotfunctionV3.coronabotfunction
-    layers:
-      - arn:aws:lambda:eu-west-3:715548309406:layer:LayerRepoPython:4
+    #layers:
+     # - arn:aws:lambda:eu-west-3:715548309406:layer:LayerRepoPython:4
       
     environment:
       CORONATOKEN: ${env:CORONATOKEN}
@@ -80,7 +80,7 @@ functions:
 #    Check the event documentation for details
     events:
       - http:
-          path: testWeb
+          path: covid19-telegram-bot
           method: post
           cors: true
 #      - websocket: $connect
