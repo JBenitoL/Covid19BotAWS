@@ -12,13 +12,15 @@ TOKEN = os.environ.get('CORONATOKEN')
 
 BASE_URL = "https://api.telegram.org/bot{}".format(TOKEN)
 
-print('FUNCION!')
+
 def coronabotfunction(event, context):
 
     data = json.loads(event["body"])
     message = str(data["message"]["text"])
     chat_id = data["message"]["chat"]["id"]
-    chatID( chat_id)
+    #print(chat_id)
+    #print(message)
+    #chatID( chat_id)
     
 
     
@@ -35,6 +37,7 @@ def coronabotfunction(event, context):
         files = {'photo': pic}
         data ={ "chat_id": chat_id}
         requests.post(url, files = files, data = data)
+    print('SALIMOS!')
     return {"statusCode": 200}
 
     

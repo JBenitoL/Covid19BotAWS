@@ -69,9 +69,9 @@ provider:
 
 functions:
   post:
-    handler: coronabotfunctionV3.coronabotfunction
-    #layers:
-     # - arn:aws:lambda:eu-west-3:715548309406:layer:LayerRepoPython:4
+    handler: coronabotfunction.coronabotfunction
+    layers:
+      - arn:aws:lambda:eu-west-3:715548309406:layer:repo-Library:1
       
     environment:
       CORONATOKEN: ${env:CORONATOKEN}
