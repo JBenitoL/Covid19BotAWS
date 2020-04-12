@@ -148,6 +148,18 @@ def GetStat(txt):
 def keywordDetector(txt):
     answer= []
     count = 0
+    if txt =='/start':
+        resp = 'Hola, soy el coronabot!\n\nTengo datos actualizados del número de contagiados y fallecidos por COVID-19 '+\
+            'en cada comunidad española.'+\
+            ' Estos datos provienen de fuentes oficiales y son facilitados por Datadista.\n\n'\
+            'Usarme es sencillo, tienes que introducir palabras clave. En una misma frase, me escribes lo que quieres saber: \n\n '+\
+            '*- Contagiados/fallecidos* \n\n *- Acumulado/diario* \n\n*- Comunidades españolas* en las que quieras conocerlo\n\n '+\
+            '\* Además, si dices *"millon"* te daré los *datos normalizados* por cada millón de habitantes. \n\n' + \
+            'Ejemplo de frase:\n\n_Numero de infectados acumulados en España, Madrid, Aragon y Andalucia_\n\n' +\
+            'No me importa en qué orden me digas las cosas. Simplemente necesito las tres primeras palabras clave y funcionaré!\n\n'+\
+            'Muchas gracias por usarme!'
+        return resp
+
     if not tipo(txt): 
         count = count +1
         answer.append('*-Contagiados/fallecidos*\n\n')
@@ -173,12 +185,12 @@ def keywordDetector(txt):
                'Te recuerdo que si añades *"millon"* te daré los datos estarán normalizados.'
         return resp
     else:
-        resp = 'Hola, no te he entendido! Funciono con palabras clave, así que dime en una misma frase qué quieres saber: \n\n '+\
+        resp = 'No te he entendido! Recuerda que funciono con palabras clave, así que dime en una misma frase qué quieres saber: \n\n '+\
             '*- Contagiados/fallecidos* \n\n *- Acumulado/diario* \n\n*- Comunidades españolas* en las que quieras conocerlo\n\n '+\
             '\* Además, si dices *"millon"* te daré los *datos normalizados* por cada millón de habitantes. \n\n' + \
             'Ejemplo de frase:\n\n_Numero de infectados acumulados en España, Madrid, Aragon y Andalucia_\n\n' +\
-            'No me importa en qué orden me digas las cosas. Simplemente necesito las tres primeras palabras clave y funcionaré!\n'+\
-            'Muchas gracias por usarme!'
+            'No me importa en qué orden me digas las cosas. Simplemente necesito las tres primeras palabras clave y funcionaré!'
+            
 
         return resp
 
