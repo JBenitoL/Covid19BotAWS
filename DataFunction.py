@@ -105,7 +105,7 @@ def ploteame(txt, Comunidad, tipo, densidad):
 def tipo(txt):
     x = txt.split() 
     for i in x:
-        if i.upper().find('MUE')>-1 or i.upper().find('FALLE')>-1:
+        if i.upper().find('MUERT')>-1 or i.upper().find('FALLE')>-1:
             return 'FALLECIDOS'
         if i.upper().find('CONTAG')>-1 or i.upper().find('INFEC')>-1:
             return 'INFECTADOS'
