@@ -73,7 +73,7 @@ def ploteame(txt, Comunidad, tipo, densidad):
             df = 1000000*df/(Poblacion( i))
             
         if tipo.upper().find('DIA')>-1:
-            ax.bar(df.index, df.diff(), color = cm.tab10(count), label = NombreComunidad)
+            ax.bar(df.index, df.diff(), color = cm.tab10(count), label = NombreComunidad, alpha = 0.6)
         
      
         elif tipo.upper().find('TOT')>-1:
