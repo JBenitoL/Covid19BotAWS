@@ -152,12 +152,12 @@ def comunidad(txt):
                 a[1] = int(x[i+1]) 
             elif x[i+1][0] == '-'  and  x[i+1][1:].isdigit():
                 a[1] = int(x[i+1]) 
-        if a[1]>8:
-            a[1]=8
-        elif a[1]<-8:
-            a[1] = -8
-        elif a[1]==0:
-            a[1] = 5
+            if a[1]>8:
+                a[1]=8
+            elif a[1]<-8:
+                a[1] = -8
+            elif a[1]==0:
+                a[1] = 5
         
                 
             return a
