@@ -53,31 +53,51 @@ def cod_ine(NomCom):
    
 def ploteame(txt, Comunidad, tipo, densidad):
 
-    count = -1
+    print('oli')
     plt.figure()
     fig, ax = plt.subplots()
-    dfOld = GetStat(txt)
-    tipo = diarioortotal(tipo)
-    for i in Comunidad:
-        count = count +1
-        
-        
-        df = dfOld.set_index('cod_ine')
-        NombreComunidad = df['CCAA'].loc[i]
-        NombreComunidad='España' if i==0 else NombreComunidad
-        df = df.loc[i][1:np.shape(dfOld)[1]]
-        df.index = pd.to_datetime(df.index) 
- 
-        if densidad: 
+    df= GetStat(txt)
+    
+    if densidad:
+        df = 1000000*df.div(getPoblacion(), axis = 0, level =0)
+    
+    df.sort_values(by=df.columns[len(df.columns)-1], ascending = False, inplace = True)
+    
+    if Comunidad[0] == 'TOP':
+        if Comunidad[1]>0:
+            #Esp = df.loc[0]
             
-            df = 1000000*df/(Poblacion( i))
+            df = df.drop(0, axis = 0, level =0).iloc[range(Comunidad[1])]
+            #df = pd.concat([df, Esp])
+            Comunidad = df.index.get_level_values(0).tolist()
+            
+            
+        else:
+            #Esp = df.loc[0]
+            df.drop(0, axis = 0, level =0, inplace = True)
+            df = df.iloc[range(len(df)+Comunidad[1], len(df))]
+            
+            #df = pd.concat([Esp,df])
+            Comunidad = df.index.get_level_values(0).tolist()
+            
+    else:
+        df = df.loc[Comunidad]
+        
+    print(Comunidad)
+    
+    tipo = diarioortotal(tipo)
+    for i in range(len(Comunidad)):
+        
+        
+        NombreComunidad = df.index[i][1]
+  
             
         if tipo.upper().find('DIA')>-1:
-            ax.bar(df.index, df.diff(), color = cm.tab10(count), label = NombreComunidad, alpha = 0.6)
+            ax.bar(df.iloc[i].index, df.iloc[i].diff(), color = cm.tab10(i), label = NombreComunidad, alpha = 0.8)
         
      
         elif tipo.upper().find('TOT')>-1:
-            ax.plot(df.index, df, label = NombreComunidad,  color = cm.tab10(count), linewidth=4)
+            ax.plot(df.iloc[i].index, df.iloc[i], label = NombreComunidad,  color = cm.tab10(i), linewidth=4)
     
     ax.xaxis.set_major_locator(mdates.DayLocator(interval=5))
     ax.xaxis.set_minor_locator(mdates.DayLocator(interval=1))
@@ -92,7 +112,7 @@ def ploteame(txt, Comunidad, tipo, densidad):
 
      
     ax.set_ylabel(ylab, fontsize = 13)
-    plt.legend(loc=2, fontsize = 13)  
+    plt.legend(loc=2, fontsize = 13, frameon=False)  
     plt.tight_layout()     
     plt.gcf().subplots_adjust(bottom=0.15)
     
@@ -123,11 +143,29 @@ def diarioortotal(txt):
 def comunidad(txt):
     x = txt.split() 
     a = []
-    for i in x:
+    for i in range(len(x)):
         
-        if cod_ine(i)>-1:
+        if x[i].upper().find('TOP')>-1:
+            a = ['TOP', 5]
             
-            a.append(cod_ine(i))
+            if x[i+1].isdigit():
+                a[1] = int(x[i+1]) 
+            elif x[i+1][0] == '-'  and  x[i+1][1:].isdigit():
+                a[1] = int(x[i+1]) 
+        if a[1]>8:
+            a[1]=8
+        elif a[1]<-8:
+            a[1] = -8
+        elif a[1]==0:
+            a[1] = 5
+        
+                
+            return a
+            
+        
+        if cod_ine(x[i])>-1:
+            
+            a.append(cod_ine(x[i]))
         
     return a
 
@@ -142,8 +180,12 @@ def GetStat(txt):
         
     s = requests.get(url).content
     Stat = pd.read_csv(io.StringIO(s.decode('utf-8')))
+    
+    Stat = Stat.set_index(['cod_ine', 'CCAA'])
+    Stat.rename(index ={'Total': 'España'}, inplace = True)
+    Stat.columns = pd.to_datetime(Stat.columns)
+    
     return Stat
-
 
 def keywordDetector(txt):
     answer= []
@@ -241,3 +283,14 @@ def Poblacion(cod):
         Prev = Prev + x
     print(float(Prev))
     return float(Prev)
+
+def takeOutDot(Number):
+    Prev = ''
+    for x in Number.split('.'):
+        
+        Prev = Prev + x
+    return float(Prev)
+
+def getPoblacion():
+    Df = pd.read_csv('PoblacionEspañola.csv',   sep=';', encoding = 'latin')
+    return Df.set_index('Num')['Numero'].apply(lambda x: takeOutDot(x))
